@@ -1,6 +1,5 @@
 require("dotenv").config();
 
-
 const express = require("express");
 const cors = require("cors");
 const { RtcTokenBuilder, RtcRole } = require("agora-access-token");
@@ -17,7 +16,7 @@ app.get("/", (req, res) => {
 
 app.get("/rtc-token", (req, res) => {
   const channelName = req.query.channelName;
-  const uid = Number(req.query.uid || 0);
+  const uidParam = req.query.uid;
 
   if (!APP_ID || !APP_CERTIFICATE) {
     return res.status(500).json({
@@ -28,6 +27,20 @@ app.get("/rtc-token", (req, res) => {
   if (!channelName) {
     return res.status(400).json({
       error: "channelName is required",
+    });
+  }
+
+  if (uidParam === undefined) {
+    return res.status(400).json({
+      error: "uid is required",
+    });
+  }
+
+  const uid = Number(uidParam);
+
+  if (!Number.isInteger(uid) || uid <= 0) {
+    return res.status(400).json({
+      error: "uid must be a positive integer",
     });
   }
 
